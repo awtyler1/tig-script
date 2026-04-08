@@ -1,0 +1,800 @@
+
+<h2 class="sr-only">Tyler Insurance Group outbound lead call script with step-by-step sections and branching discovery tracks</h2>
+
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body, .root {
+    font-family: var(--font-sans);
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--color-text-primary);
+  }
+
+  .root { padding: 0 0 3rem; }
+
+  .header {
+    background: #0B2447;
+    color: #fff;
+    padding: 1rem 1.5rem;
+    border-radius: var(--border-radius-lg);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+  }
+  .header-title { font-size: 15px; font-weight: 500; letter-spacing: 0.03em; }
+  .header-sub { font-size: 12px; opacity: 0.65; margin-top: 2px; }
+  .header-badge {
+    background: #C9A84C;
+    color: #0B2447;
+    font-size: 11px;
+    font-weight: 500;
+    padding: 4px 10px;
+    border-radius: 20px;
+    white-space: nowrap;
+  }
+
+  .step {
+    border: 0.5px solid var(--color-border-tertiary);
+    border-radius: var(--border-radius-lg);
+    margin-bottom: 1rem;
+    overflow: hidden;
+    background: var(--color-background-primary);
+  }
+
+  .step-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 0.85rem 1.25rem;
+    cursor: pointer;
+    user-select: none;
+    background: var(--color-background-primary);
+    border-bottom: 0.5px solid transparent;
+    transition: background 0.15s;
+  }
+  .step-header:hover { background: var(--color-background-secondary); }
+  .step.open .step-header { border-bottom: 0.5px solid var(--color-border-tertiary); }
+
+  .step-num {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: #0B2447;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 500;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .step-num.gold { background: #C9A84C; color: #0B2447; }
+
+  .step-title-block { flex: 1; }
+  .step-title { font-size: 14px; font-weight: 500; }
+  .step-meta { font-size: 12px; color: var(--color-text-secondary); margin-top: 1px; }
+
+  .step-chevron {
+    font-size: 14px;
+    color: var(--color-text-secondary);
+    transition: transform 0.2s;
+    flex-shrink: 0;
+  }
+  .step.open .step-chevron { transform: rotate(180deg); }
+
+  .step-body { display: none; padding: 1.25rem; }
+  .step.open .step-body { display: block; }
+
+  .say-box {
+    background: #EEF3FA;
+    border: 1.5px solid #B5D4F4;
+    border-radius: var(--border-radius-md);
+    padding: 1rem 1.1rem;
+    margin-bottom: 1rem;
+    color: #0B2447;
+    font-size: 15px;
+    line-height: 1.7;
+  }
+
+  .note-box {
+    background: var(--color-background-secondary);
+    border-left: 3px solid var(--color-border-secondary);
+    border-radius: 0 var(--border-radius-md) var(--border-radius-md) 0;
+    padding: 0.75rem 1rem;
+    margin-bottom: 1rem;
+    font-size: 13px;
+    color: var(--color-text-secondary);
+    line-height: 1.6;
+  }
+  .note-box strong { color: var(--color-text-primary); font-weight: 500; }
+
+  .compliance-box {
+    background: #FFF5F5;
+    border: 1.5px solid #F7C1C1;
+    border-radius: var(--border-radius-md);
+    padding: 0.85rem 1rem;
+    margin-bottom: 1rem;
+    font-size: 13px;
+    color: #791F1F;
+    line-height: 1.6;
+  }
+  .compliance-box .c-label {
+    font-weight: 500;
+    font-size: 11px;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: #A32D2D;
+    margin-bottom: 4px;
+  }
+
+  .branch-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 1rem;
+  }
+  .branch-col {
+    border: 0.5px solid var(--color-border-tertiary);
+    border-radius: var(--border-radius-md);
+    padding: 0.85rem 1rem;
+  }
+  .branch-col .b-label {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-text-secondary);
+    margin-bottom: 6px;
+  }
+  .branch-col .b-label.yes { color: #3B6D11; }
+  .branch-col .b-label.no { color: #A32D2D; }
+  .branch-col p { font-size: 13px; color: var(--color-text-primary); line-height: 1.6; }
+
+  .discovery-track {
+    border: 0.5px solid var(--color-border-tertiary);
+    border-radius: var(--border-radius-md);
+    margin-bottom: 10px;
+    overflow: hidden;
+  }
+  .track-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0.7rem 1rem;
+    cursor: pointer;
+    background: var(--color-background-secondary);
+    user-select: none;
+  }
+  .track-header:hover { background: var(--color-background-tertiary); }
+  .track-pill {
+    font-size: 11px;
+    font-weight: 500;
+    padding: 3px 9px;
+    border-radius: 20px;
+    background: #0B2447;
+    color: #fff;
+  }
+  .track-name { font-size: 13px; font-weight: 500; flex: 1; }
+  .track-chevron { font-size: 12px; color: var(--color-text-secondary); transition: transform 0.2s; }
+  .discovery-track.open .track-chevron { transform: rotate(180deg); }
+  .track-body { display: none; padding: 1rem; border-top: 0.5px solid var(--color-border-tertiary); background: var(--color-background-primary); }
+  .discovery-track.open .track-body { display: block; }
+
+  .checklist { list-style: none; }
+  .checklist li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 6px 0;
+    font-size: 14px;
+    border-bottom: 0.5px solid var(--color-border-tertiary);
+  }
+  .checklist li:last-child { border-bottom: none; }
+  .checklist li input[type="checkbox"] { margin-top: 3px; flex-shrink: 0; }
+
+  .sep-ask {
+    border: 0.5px solid var(--color-border-tertiary);
+    border-radius: var(--border-radius-md);
+    padding: 0.85rem 1rem;
+    margin-bottom: 8px;
+    font-size: 14px;
+    background: var(--color-background-primary);
+  }
+  .sep-ask .q-label {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--color-text-secondary);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+
+  .drug-fields {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-top: 8px;
+  }
+  .drug-fields span {
+    background: var(--color-background-secondary);
+    border-radius: var(--border-radius-md);
+    padding: 4px 8px;
+    font-size: 12px;
+    color: var(--color-text-secondary);
+    text-align: center;
+  }
+
+  .step-progress {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+  }
+  .prog-dot {
+    height: 4px;
+    border-radius: 2px;
+    background: var(--color-border-secondary);
+    flex: 1;
+    min-width: 20px;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .prog-dot.active { background: #0B2447; }
+  .prog-dot.done { background: #C9A84C; }
+
+  .time-badge {
+    font-size: 11px;
+    color: var(--color-text-secondary);
+    background: var(--color-background-secondary);
+    border-radius: 20px;
+    padding: 3px 9px;
+    border: 0.5px solid var(--color-border-tertiary);
+    white-space: nowrap;
+  }
+
+  .divider-label {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--color-text-secondary);
+    margin: 1rem 0 0.6rem;
+  }
+
+  .benefit-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 1rem;
+  }
+  .benefit-btn {
+    padding: 0.5rem 0.75rem;
+    border: 0.5px solid var(--color-border-secondary);
+    border-radius: var(--border-radius-md);
+    background: var(--color-background-secondary);
+    font-size: 13px;
+    cursor: pointer;
+    text-align: left;
+    color: var(--color-text-primary);
+    transition: background 0.1s, border-color 0.1s;
+  }
+  .benefit-btn:hover, .benefit-btn.selected {
+    background: #EEF3FA;
+    border-color: #B5D4F4;
+    color: #0B2447;
+  }
+
+  .enroll-confirm {
+    background: #FFFBEB;
+    border: 1.5px solid #FAC775;
+    border-radius: var(--border-radius-md);
+    padding: 1rem 1.1rem;
+    font-size: 15px;
+    color: #412402;
+    line-height: 1.7;
+    margin-bottom: 1rem;
+  }
+  .enroll-confirm .e-label {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: #854F0B;
+    margin-bottom: 6px;
+  }
+
+  .value-tabs { display: flex; gap: 6px; margin-bottom: 10px; flex-wrap: wrap; }
+  .val-tab {
+    font-size: 12px;
+    padding: 4px 12px;
+    border-radius: 20px;
+    border: 0.5px solid var(--color-border-secondary);
+    background: var(--color-background-secondary);
+    cursor: pointer;
+    color: var(--color-text-secondary);
+    transition: all 0.15s;
+  }
+  .val-tab.active { background: #0B2447; color: #fff; border-color: #0B2447; }
+  .val-content { display: none; }
+  .val-content.active { display: block; }
+
+  .wrap-up-check { list-style: none; }
+  .wrap-up-check li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 0;
+    font-size: 14px;
+    border-bottom: 0.5px solid var(--color-border-tertiary);
+  }
+  .wrap-up-check li:last-child { border-bottom: none; }
+  .wrap-up-check input[type="checkbox"] { flex-shrink: 0; }
+</style>
+
+<div class="root">
+
+  <div class="header">
+    <div>
+      <div class="header-title">TIG Outbound Lead Script</div>
+      <div class="header-sub">Internal use only &bull; All calls recorded</div>
+    </div>
+    <div class="header-badge">Live Call</div>
+  </div>
+
+  <div class="step-progress" id="progress"></div>
+
+  <!-- STEP INTRO -->
+  <div class="step open" data-step="0">
+    <div class="step-header" onclick="toggleStep(this)">
+      <div class="step-num gold">↗</div>
+      <div class="step-title-block">
+        <div class="step-title">Intro</div>
+        <div class="step-meta">Open the call</div>
+      </div>
+      <span class="time-badge">45–60 sec</span>
+      <span class="step-chevron">▾</span>
+    </div>
+    <div class="step-body">
+      <div class="compliance-box">
+        <div class="c-label">Compliance</div>
+        State that you are on a recorded line. Required on every call. Do not skip.
+      </div>
+      <div class="say-box">
+        Hello, is [Client Name] available?
+      </div>
+      <div class="say-box">
+        Hi [Client Name], my name is [Your Full Name] and I am a licensed insurance agent with Tyler Insurance Group, on a recorded line. I am calling because you recently submitted a request for information about Medicare plans. I just wanted to reach out personally to help.
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP DISCOVERY -->
+  <div class="step" data-step="1">
+    <div class="step-header" onclick="toggleStep(this)">
+      <div class="step-num">1</div>
+      <div class="step-title-block">
+        <div class="step-title">Discovery — Find their trigger</div>
+        <div class="step-meta">Ask before anything else</div>
+      </div>
+      <span class="step-chevron">▾</span>
+    </div>
+    <div class="step-body">
+      <div class="note-box">
+        <strong>Important:</strong> These leads clicked a specific benefit ad before submitting. Ask this question before anything else. Their answer tells you exactly where to take the conversation. Do not skip or assume.
+      </div>
+      <div class="say-box">
+        Quick question before we dive in — when you were looking at Medicare plans online, was there something specific that caught your eye? For example, were you looking at a grocery benefit, dental coverage, money back on your Part B premium, or something else?
+      </div>
+
+      <div class="divider-label">Based on their answer, open the matching track</div>
+
+      <div class="discovery-track" id="track-grocery">
+        <div class="track-header" onclick="toggleTrack(this)">
+          <span class="track-pill">Grocery</span>
+          <span class="track-name">Grocery benefit</span>
+          <span class="track-chevron">▾</span>
+        </div>
+        <div class="track-body">
+          <div class="say-box">Great — that grocery allowance is one of my favorites to talk about. That benefit is available on certain plans for people who have both Medicare and Medicaid. Quick question — are you currently on Medicaid or receiving any state assistance with your health coverage?</div>
+          <div class="branch-row">
+            <div class="branch-col">
+              <div class="b-label yes">Yes — on Medicaid</div>
+              <p>Dual eligible. High likelihood of qualifying. Proceed with full plan review focused on grocery and OTC allowance.</p>
+            </div>
+            <div class="branch-col">
+              <div class="b-label no">No — not on Medicaid</div>
+              <p>Grocery benefit may not be available. Pivot to dental, vision, or copay reduction.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="discovery-track" id="track-partb">
+        <div class="track-header" onclick="toggleTrack(this)">
+          <span class="track-pill">Part B</span>
+          <span class="track-name">Part B giveback</span>
+          <span class="track-chevron">▾</span>
+        </div>
+        <div class="track-body">
+          <div class="say-box">Good — that is one of my favorite benefits because it actually puts real money back in your Social Security check every month. To see if that is available to you, are you currently paying the standard Part B premium — around $185 a month?</div>
+          <div class="branch-row">
+            <div class="branch-col">
+              <div class="b-label yes">Yes — paying standard</div>
+              <p>Strong candidate. Plans with Part B giveback are available in most Kentucky counties. Proceed.</p>
+            </div>
+            <div class="branch-col">
+              <div class="b-label no">No — on Medicaid or Extra Help</div>
+              <p>Part B may already be covered. Redirect to other strong benefits.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="discovery-track" id="track-dental">
+        <div class="track-header" onclick="toggleTrack(this)">
+          <span class="track-pill">Dental</span>
+          <span class="track-name">Dental coverage</span>
+          <span class="track-chevron">▾</span>
+        </div>
+        <div class="track-body">
+          <div class="say-box">Great — dental is one of the most underused benefits in Medicare Advantage. A lot of people do not realize it is even available. Do you currently have any dental coverage at all, or are you paying out of pocket when you go to the dentist?</div>
+          <div class="branch-row">
+            <div class="branch-col">
+              <div class="b-label yes">No dental currently</div>
+              <p>Strong motivator. Lead with dental in your plan presentation.</p>
+            </div>
+            <div class="branch-col">
+              <div class="b-label no">Has dental</div>
+              <p>Ask what it covers and whether they are happy with it. Position a plan upgrade.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="discovery-track" id="track-otc">
+        <div class="track-header" onclick="toggleTrack(this)">
+          <span class="track-pill">OTC</span>
+          <span class="track-name">OTC allowance</span>
+          <span class="track-chevron">▾</span>
+        </div>
+        <div class="track-body">
+          <div class="say-box">Good — that spending allowance can add up fast. It is basically a quarterly allowance you can use on things like vitamins, pain relievers, blood pressure monitors, even some personal care items. Are you currently on a Medicare Advantage plan or do you have Original Medicare?</div>
+          <div class="branch-row">
+            <div class="branch-col">
+              <div class="b-label yes">Medicare Advantage</div>
+              <p>Compare current OTC benefit to what is available. Upgrade opportunity.</p>
+            </div>
+            <div class="branch-col">
+              <div class="b-label no">Original Medicare</div>
+              <p>Strong case to move to MA. OTC benefit is exclusive to MA plans.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="discovery-track" id="track-unsure">
+        <div class="track-header" onclick="toggleTrack(this)">
+          <span class="track-pill">?</span>
+          <span class="track-name">Not sure / just browsing</span>
+          <span class="track-chevron">▾</span>
+        </div>
+        <div class="track-body">
+          <div class="say-box">No problem at all — a lot of people just want to make sure they are not missing out on something. Let me ask you this: what does your current coverage look like? Are you on a Medicare Advantage plan or do you have Original Medicare?</div>
+          <div class="note-box">Use their answer to identify their current situation and build buying reasons from there. Goal: find at least 3 benefits they are missing before presenting any plan.</div>
+        </div>
+      </div>
+
+      <div class="divider-label" style="margin-top:1.25rem;">Confirm current coverage</div>
+      <div class="note-box">Once you know their benefit trigger, confirm current coverage before moving forward. This sets up the value statement.</div>
+      <div class="say-box">What is your current coverage — are you on a Medicare Advantage plan right now, or do you have Original Medicare?</div>
+      <div class="branch-row">
+        <div class="branch-col">
+          <div class="b-label yes">Knows their coverage</div>
+          <p>Great, so you have [repeat back]. That is one of the plans we represent. Let me pull up your information and we will see what is available to you.</p>
+        </div>
+        <div class="branch-col">
+          <div class="b-label no">Does not know</div>
+          <p>No worries, I can still help you with that. Would you mind grabbing your insurance card for me?</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP BENEFITS + DISCLOSURES -->
+  <div class="step" data-step="2">
+    <div class="step-header" onclick="toggleStep(this)">
+      <div class="step-num">2</div>
+      <div class="step-title-block">
+        <div class="step-title">Benefits overview &amp; disclosures</div>
+        <div class="step-meta">Required before any plan discussion</div>
+      </div>
+      <span class="time-badge">5–7 min</span>
+      <span class="step-chevron">▾</span>
+    </div>
+    <div class="step-body">
+      <div class="say-box">
+        As I mentioned, I am licensed and appointed with the top Medicare carriers in your area. What that means for you is that I will do a deep dive into your coverage options today to make sure we are maximizing every benefit you are entitled to.<br><br>
+        One important thing to know about these plans is that they change every year. Copays, out-of-pocket costs, and additional benefits can all shift. That is why it is important to shop and compare your coverage each year.<br><br>
+        Before we get into the specifics, I need to read you two quick disclosures. It takes less than a minute and then we can focus on finding you the best plan.
+      </div>
+
+      <div class="divider-label">Value statement — select enrollment period</div>
+      <div class="value-tabs">
+        <div class="val-tab active" onclick="switchVal(this,'oep')">OEP (Jan 1 – Mar 31)</div>
+        <div class="val-tab" onclick="switchVal(this,'aep')">AEP (Oct 15 – Dec 7)</div>
+        <div class="val-tab" onclick="switchVal(this,'rest')">Rest of year</div>
+      </div>
+      <div class="val-content active" id="val-oep">
+        <div class="say-box">Right now we are in the Medicare Advantage Open Enrollment Period, which means we have an opportunity to look into your current plan and see if there are any benefits such as dental, vision, lower copays, or lower drug costs that you may be missing out on.</div>
+      </div>
+      <div class="val-content" id="val-aep">
+        <div class="say-box">[Client Name], first I want to compliment you on getting ahead of the AEP rush. My goal today is to help you shop and compare your current coverage to make sure you are maximizing the benefits you are entitled to going into the new year. We may be able to lower your copays and add dental, vision, hearing, grocery benefits, or a flex card.</div>
+      </div>
+      <div class="val-content" id="val-rest">
+        <div class="say-box">[Client Name], my goal today is to review and compare your current coverage to make sure you are maximizing the benefits you are entitled to for the remainder of the year. We may be able to lower your copays and add dental, vision, hearing, grocery benefits, or a flex card.</div>
+      </div>
+
+      <div class="say-box" style="margin-top:1rem;">[Client Name], do you have any additional coverage such as Tricare, VA, or employer coverage?</div>
+
+      <div class="divider-label">Disclosure 1 — TPMO disclaimer</div>
+      <div class="compliance-box">
+        <div class="c-label">Compliance — read verbatim</div>
+        We do not offer every plan available in your area. Any information I provide is limited to the plans we do offer in your area. Please contact Medicare.gov or 1-800-MEDICARE to get information on all of your options. Please be aware that you are not required to give any health-related information unless it is needed to determine your eligibility to enroll in a plan. There is no obligation to enroll. Your current or future Medicare enrollment status will not be impacted, and automatic enrollment will not occur. Any information provided during this call will not affect your ability to request enrollment in a plan.
+      </div>
+
+      <div class="divider-label">Disclosure 2 — Scope of appointment</div>
+      <div class="compliance-box">
+        <div class="c-label">Compliance — read verbatim</div>
+        We offer Medicare Advantage plans, Medicare Supplement plans, and Prescription Drug plans. Do you want to continue discussing these plan options on [today's date]?
+      </div>
+      <div class="note-box"><strong>Any affirmative response counts as verbal SOA confirmation.</strong> Document the date immediately.</div>
+      <div class="say-box">Are you looking into coverage for yourself or someone else?</div>
+    </div>
+  </div>
+
+  <!-- STEP SEP -->
+  <div class="step" data-step="3">
+    <div class="step-header" onclick="toggleStep(this)">
+      <div class="step-num">3</div>
+      <div class="step-title-block">
+        <div class="step-title">SEP verification</div>
+        <div class="step-meta">Skip only during AEP</div>
+      </div>
+      <span class="time-badge">5–7 min</span>
+      <span class="step-chevron">▾</span>
+    </div>
+    <div class="step-body">
+      <div class="compliance-box">
+        <div class="c-label">Compliance</div>
+        Outside of AEP, the client must have a qualifying Special Enrollment Period before you can enroll them in a new plan. Verify SEP before presenting anything.
+      </div>
+      <div class="say-box">Now I am going to verify your information inside the Medicare system to see if you have a Special Enrollment Period that will allow us to make a change today.</div>
+
+      <div class="divider-label">Ask each of the following</div>
+      <div class="sep-ask"><div class="q-label">Question 1</div>Do you receive Extra Help or Medicaid?</div>
+      <div class="sep-ask"><div class="q-label">Question 2</div>Have you made any changes to your Medicare plan in the last 90 days?</div>
+      <div class="sep-ask"><div class="q-label">Question 3</div>Have you recently moved? If so, have you notified Medicare of your new address?</div>
+      <div class="sep-ask"><div class="q-label">Action item</div>Look up whether there is a 5-star plan available in their area.</div>
+
+      <div class="note-box"><strong>When you confirm a SEP, make it a moment.</strong> Say something like: "Great news — you do have a Special Enrollment Period available, which means we can look at making a change today if we find something that works better for you." You must also state the SEP type and proposed effective date before presenting any plan.</div>
+    </div>
+  </div>
+
+  <!-- STEP WANTS & NEEDS -->
+  <div class="step" data-step="4">
+    <div class="step-header" onclick="toggleStep(this)">
+      <div class="step-num">4</div>
+      <div class="step-title-block">
+        <div class="step-title">Establish wants and needs</div>
+        <div class="step-meta">Build 3–4 buying reasons before presenting</div>
+      </div>
+      <span class="time-badge">6–8 min</span>
+      <span class="step-chevron">▾</span>
+    </div>
+    <div class="step-body">
+      <div class="note-box"><strong>Goal:</strong> Build 3–4 buying reasons before you present any plan. One benefit is not enough to close. You already know their primary trigger. Use these prompts to stack additional reasons on top of it.</div>
+      <div class="say-box">When it comes to Medicare Advantage, many plans include dental, vision, hearing, over-the-counter, and transportation benefits. What separates the plans is the amount of each benefit and the copays. Which of these matters most to you?</div>
+
+      <div class="divider-label">If client lists only 1–2 benefits, build more with these</div>
+      <div class="benefit-grid">
+        <div class="benefit-btn" onclick="this.classList.toggle('selected')">Dental — do you see a dentist regularly?</div>
+        <div class="benefit-btn" onclick="this.classList.toggle('selected')">Vision — do you wear glasses or need eye care?</div>
+        <div class="benefit-btn" onclick="this.classList.toggle('selected')">Hearing — do you require hearing aids?</div>
+        <div class="benefit-btn" onclick="this.classList.toggle('selected')">Transportation — would rides to appointments help?</div>
+        <div class="benefit-btn" onclick="this.classList.toggle('selected')">OTC — what about over-the-counter benefits?</div>
+        <div class="benefit-btn" onclick="this.classList.toggle('selected')">Copays — lower max out-of-pocket costs?</div>
+      </div>
+      <div class="say-box">I will make sure to find a plan that gives you the most [repeat the benefits they chose].</div>
+    </div>
+  </div>
+
+  <!-- STEP MEDS & DOCTORS -->
+  <div class="step" data-step="5">
+    <div class="step-header" onclick="toggleStep(this)">
+      <div class="step-num">5</div>
+      <div class="step-title-block">
+        <div class="step-title">Medications and doctors</div>
+        <div class="step-meta">Always get meds before doctors</div>
+      </div>
+      <span class="time-badge">8–10 min</span>
+      <span class="step-chevron">▾</span>
+    </div>
+    <div class="step-body">
+      <div class="compliance-box">
+        <div class="c-label">Compliance</div>
+        Always get medications before doctors. Do not skip this step even if the client says they take no medications.
+      </div>
+      <div class="say-box">Before we look at plans, I want to make sure any medications you take will be covered. Are there any prescriptions we need to check on?</div>
+      <div class="branch-row">
+        <div class="branch-col">
+          <div class="b-label yes">Yes — has medications</div>
+          <p>Go ahead and grab your medication list and I will add them now. I will need the medication name, the form it comes in, the strength, and how many you take per month.</p>
+        </div>
+        <div class="branch-col">
+          <div class="b-label no">No — no medications</div>
+          <p>Not a problem. Before we move on, I want you to know that not all plans cover prescriptions the same way. If you think of anything, let me know and we can check before we finalize anything.</p>
+        </div>
+      </div>
+      <div class="note-box">
+        <strong>Required fields for each medication:</strong>
+        <div class="drug-fields">
+          <span>Drug name</span>
+          <span>Form (tablet / liquid)</span>
+          <span>Strength</span>
+          <span>Qty / month</span>
+        </div>
+        <div style="margin-top:8px;">Incomplete medication entry is a service and compliance failure.</div>
+      </div>
+      <div class="say-box">Now let's make sure your doctors are covered. Do you have a primary care doctor or any specialists you want to make sure are in the network?</div>
+      <div class="note-box"><strong>No PCP + HMO plan?</strong> Offer to help find one near them. This is a service win.</div>
+      <div class="say-box">[Client Name], I am going to do my best to make sure your doctors are covered. As we discussed, we will focus on getting you all the benefits you are entitled to today.</div>
+    </div>
+  </div>
+
+  <!-- STEP PRESENT PLANS -->
+  <div class="step" data-step="6">
+    <div class="step-header" onclick="toggleStep(this)">
+      <div class="step-num">6</div>
+      <div class="step-title-block">
+        <div class="step-title">Present plan options</div>
+        <div class="step-meta">Max 2 plans — lead with the best fit</div>
+      </div>
+      <span class="time-badge">8–10 min</span>
+      <span class="step-chevron">▾</span>
+    </div>
+    <div class="step-body">
+      <div class="compliance-box">
+        <div class="c-label">Compliance</div>
+        Present no more than 2 plans. Presenting more creates confusion and hurts close rate. Lead with the plan that best matches what the client told you.
+      </div>
+      <div class="say-box">What I am going to do now is place you on a brief hold while I sort through the options to find a plan that covers your doctors, your medications, and gives you the additional benefits you are entitled to. It will just be a moment.</div>
+      <div class="note-box"><strong>Use hold time to have your recommendation ready.</strong> Never return to the client without a clear plan to present. Coming back uncertain damages trust.</div>
+      <div class="say-box">Thank you for holding. Based on what you shared with me, I found a plan that is a strong fit. It is [Plan Name], [Plan Number], with a premium of [$]. Let me walk you through it.</div>
+      <div class="divider-label">Walk through in this order</div>
+      <div class="checklist" style="list-style:none;">
+        <div style="display:flex;align-items:center;gap:10px;padding:7px 0;font-size:14px;border-bottom:0.5px solid var(--color-border-tertiary);">
+          <input type="checkbox"> Summary of Benefits — focused on the specific benefits the client asked about
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;padding:7px 0;font-size:14px;border-bottom:0.5px solid var(--color-border-tertiary);">
+          <input type="checkbox"> Medication cost breakdown — confirm each medication and what they will pay
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;padding:7px 0;font-size:14px;">
+          <input type="checkbox"> Doctor network confirmation — confirm each doctor they named
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP CLOSE -->
+  <div class="step" data-step="7">
+    <div class="step-header" onclick="toggleStep(this)">
+      <div class="step-num">7</div>
+      <div class="step-title-block">
+        <div class="step-title">Summarize and close</div>
+        <div class="step-meta">Use real dollar amounts</div>
+      </div>
+      <span class="time-badge">5–7 min</span>
+      <span class="step-chevron">▾</span>
+    </div>
+    <div class="step-body">
+      <div class="note-box"><strong>Use real dollar amounts in your summary.</strong> Specific numbers build trust. Vague recaps lose sales.</div>
+      <div class="say-box">All right [Client Name], let me recap what we found for you today.</div>
+      <div class="divider-label">Cover each of the following</div>
+      <div class="checklist" style="list-style:none;">
+        <div style="display:flex;align-items:center;gap:10px;padding:7px 0;font-size:14px;border-bottom:0.5px solid var(--color-border-tertiary);">
+          <input type="checkbox"> <span><strong style="font-weight:500">Doctors:</strong> We verified that [doctor names] are in network for this plan.</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;padding:7px 0;font-size:14px;border-bottom:0.5px solid var(--color-border-tertiary);">
+          <input type="checkbox"> <span>If a doctor is not in network: We also found [specialty or name] who is in network, which is great.</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;padding:7px 0;font-size:14px;border-bottom:0.5px solid var(--color-border-tertiary);">
+          <input type="checkbox"> <span><strong style="font-weight:500">Prescriptions:</strong> We verified that your prescriptions are covered by this plan.</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;padding:7px 0;font-size:14px;">
+          <input type="checkbox"> <span><strong style="font-weight:500">Benefits:</strong> We found you a plan that includes [list benefits with dollar amounts].</span>
+        </div>
+      </div>
+      <div class="say-box" style="margin-top:1rem;">[Client Name], since we found a plan that fits your needs, go ahead and grab your Medicare card and we can move to the final step.</div>
+      <div class="enroll-confirm">
+        <div class="e-label">Enrollment confirmation — read verbatim</div>
+        [Client Name], are you calling to enroll in [Carrier], [Plan Name], [Plan Number] with a premium of [$] and an effective date of [date] over the phone today?
+      </div>
+      <div class="note-box"><strong>Stop talking after you ask the enrollment confirmation question.</strong> Let the client respond. Silence is your friend here.</div>
+    </div>
+  </div>
+
+  <!-- STEP WRAP UP -->
+  <div class="step" data-step="8">
+    <div class="step-header" onclick="toggleStep(this)">
+      <div class="step-num gold">✓</div>
+      <div class="step-title-block">
+        <div class="step-title">Enrollment and wrap-up</div>
+        <div class="step-meta">Complete before ending the call</div>
+      </div>
+      <span class="time-badge">10–15 min</span>
+      <span class="step-chevron">▾</span>
+    </div>
+    <div class="step-body">
+      <div class="compliance-box">
+        <div class="c-label">Compliance</div>
+        Complete the enrollment application before ending the call. Do not end the call with enrollment incomplete unless the client requests it.
+      </div>
+      <div class="say-box">I want to congratulate you [Client Name] and thank you for taking the time to review your coverage today. You made a great decision.<br><br>In the next 14 to 20 business days you will receive your policy documents and new insurance card in the mail. Please remember to notify your doctors and pharmacy of the plan change before your effective date.</div>
+
+      <div class="divider-label">Before ending the call, confirm all of the following</div>
+      <ul class="wrap-up-check">
+        <li><input type="checkbox"> Application submitted and confirmation number obtained</li>
+        <li><input type="checkbox"> Effective date stated clearly to the client</li>
+        <li><input type="checkbox"> Client instructed to notify doctors and pharmacy</li>
+        <li><input type="checkbox"> Client knows when to expect their new ID card</li>
+        <li><input type="checkbox"> Pipeline stage updated to <strong style="font-weight:500">Enrolled</strong> in the TIG platform immediately after the call</li>
+        <li><input type="checkbox"> Call note logged: carrier, plan name, plan number, effective date, confirmation number</li>
+      </ul>
+
+      <div class="note-box" style="margin-top:1rem;">Questions on compliance or script guidance? Contact Austin before your next call.<br><strong style="font-weight:500">(859) 619-6672 &nbsp;|&nbsp; austin@tylerinsurancegroup.com</strong></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  const steps = document.querySelectorAll('.step');
+  const progressEl = document.getElementById('progress');
+
+  steps.forEach((_, i) => {
+    const dot = document.createElement('div');
+    dot.className = 'prog-dot' + (i === 0 ? ' active' : '');
+    dot.onclick = () => {
+      steps[i].querySelector('.step-header').click();
+      dot.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    };
+    progressEl.appendChild(dot);
+  });
+
+  function updateProgress() {
+    const dots = document.querySelectorAll('.prog-dot');
+    steps.forEach((step, i) => {
+      const open = step.classList.contains('open');
+      dots[i].className = 'prog-dot' + (open ? ' active' : '');
+    });
+  }
+
+  function toggleStep(header) {
+    const step = header.closest('.step');
+    const wasOpen = step.classList.contains('open');
+    steps.forEach(s => s.classList.remove('open'));
+    if (!wasOpen) step.classList.add('open');
+    updateProgress();
+  }
+
+  function toggleTrack(header) {
+    const track = header.closest('.discovery-track');
+    track.classList.toggle('open');
+  }
+
+  function switchVal(tab, id) {
+    document.querySelectorAll('.val-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.val-content').forEach(c => c.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('val-' + id).classList.add('active');
+  }
+</script>
